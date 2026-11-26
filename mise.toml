@@ -1,0 +1,18 @@
+[tools]
+rust = "1.100.0"
+
+[tasks.build]
+description = "Build release binary"
+run = "cargo build --release"
+
+[tasks.test]
+description = "Run unit and integration tests"
+run = "cargo test"
+
+[tasks.lint]
+description = "Run rustfmt, clippy, and creaper on itself"
+run = [
+  "cargo fmt --check",
+  "cargo clippy --all-targets -- -D warnings",
+  "cargo run --locked -- --tracked",
+]

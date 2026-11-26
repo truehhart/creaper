@@ -1,0 +1,50 @@
+[package]
+name = "creaper"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+description = "Strict multi-language comment and docstring linter powered by tree-sitter"
+license = "MIT"
+repository = "https://github.com/truehhart/creaper"
+keywords = ["linter", "comments", "tree-sitter", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+clap = { version = "4.6", features = ["derive"] }
+globset = "0.4"
+ignore = "0.4"
+rayon = "1.12"
+regex = "1.13"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "1.2"
+tree-sitter = "0.27"
+tree-sitter-bash = "0.25"
+tree-sitter-hcl = "1.1"
+tree-sitter-javascript = "0.25"
+tree-sitter-nu = { git = "https://github.com/nushell/tree-sitter-nu.git", rev = "5a5f9c25f9c356f703a637bb3658248a29713684" }
+tree-sitter-php = "0.25"
+tree-sitter-python = "0.25"
+tree-sitter-rust = "0.24"
+tree-sitter-toml-ng = "0.7"
+tree-sitter-typescript = "0.23"
+tree-sitter-yaml = "0.7"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
