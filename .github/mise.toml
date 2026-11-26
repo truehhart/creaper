@@ -1,0 +1,23 @@
+[tools]
+"aqua:koalaman/shellcheck" = "0.11.0"
+"aqua:rhysd/actionlint" = "1.7.12"
+"aqua:zizmorcore/zizmor" = "1.28.0"
+
+[tasks.actionlint]
+run = '''
+actionlint \
+  -ignore 'step must run script with "run" section or run action with "uses" section' \
+  -ignore 'specifying action "\$/.+" in invalid format because ref is missing' \
+  -ignore 'property "[^"]+" is not defined in object type \{.*outcome: string' \
+  -ignore 'SC2016:'
+'''
+
+[tasks.zizmor]
+run = '''
+let token = $env.GH_TOKEN? | default $env.GITHUB_TOKEN? | default (try { ^gh auth token | str trim } catch { null })
+if ($token | is-empty) { ^zizmor . } else { GH_TOKEN=$token ^zizmor . }
+'''
+shell = "nu -c"
+
+[tasks.validate]
+depends = ["actionlint", "zizmor"]

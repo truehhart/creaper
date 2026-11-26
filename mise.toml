@@ -1,18 +1,30 @@
+monorepo_root = true
+
 [tools]
-rust = "1.100.0"
+"aqua:nushell/nushell" = "0.114.1"
+"aqua:pre-commit/pre-commit" = "4.6.1"
+"aqua:tamasfe/taplo" = "0.10.0"
+sops = "3.13.3"
+
+[monorepo]
+config_roots = [".github", "app", "infra"]
+
+[tasks.init]
+depends = ["//...:init"]
+description = "Install the git hooks and set up every part"
+run = "pre-commit install"
+
+[tasks.fmt]
+depends = ["//...:fmt", "toml-fmt"]
 
 [tasks.build]
-description = "Build release binary"
-run = "cargo build --release"
+depends = ["//...:build"]
 
-[tasks.test]
-description = "Run unit and integration tests"
-run = "cargo test"
+[tasks.toml-fmt]
+run = "taplo fmt"
 
-[tasks.lint]
-description = "Run rustfmt, clippy, and creaper on itself"
-run = [
-  "cargo fmt --check",
-  "cargo clippy --all-targets -- -D warnings",
-  "cargo run --locked -- --tracked",
-]
+[tasks.toml-lint]
+run = "taplo lint"
+
+[tasks.validate]
+depends = ["//...:validate", "toml-fmt --check --diff", "toml-lint"]

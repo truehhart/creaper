@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: mise-fmt
+        name: mise fmt
+        entry: mise run //:fmt
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: mise-validate
+        name: mise validate
+        entry: mise run //:validate
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -139,3 +139,42 @@ repos:
         entry: mise exec -- creaper
         language: system
 ```
+
+## Development
+
+### Layout
+
+| Path       | Content                                             |
+| ---------- | --------------------------------------------------- |
+| `app/`     | The Rust crate, tests, and build tasks.             |
+| `infra/`   | OpenTofu and Terragrunt stacks for GitHub secrets.  |
+| `.github/` | CI, release-please, and binary publishing workflows.|
+
+### Setup
+
+Install [mise](https://mise.jdx.dev). It provides every other tool. Run every task through it:
+`mise run '//<part>:<task>'` for a part, `mise run '//:<task>'` for the root.
+
+```sh
+mise run '//:init'
+```
+
+### Tasks
+
+| Task               | Action                                      |
+| ------------------ | ------------------------------------------- |
+| `//:init`          | Install git hooks.                          |
+| `//:fmt`           | Format everything.                          |
+| `//:validate`      | Run every check. CI runs this task.         |
+| `//:build`         | Build every part. CI runs this task.        |
+| `//app:build`      | Build the release binary.                   |
+| `//app:fmt`        | Format the Rust sources.                    |
+| `//app:lint`       | Run clippy and `creaper` on tracked files.  |
+| `//app:test`       | Run the unit and integration tests.         |
+| `//app:validate`   | Run every app check.                        |
+| `//infra:fmt`      | Format the OpenTofu and Terragrunt files.   |
+| `//infra:validate` | Check the format of the infra files.        |
+
+### Releases
+
+Pushes to `main` update the release PR via `release-please` using a GitHub App token (`RELEASE_APP_CLIENT_ID` and `RELEASE_APP_PRIVATE_KEY`, managed under `infra/stacks/github/truehhart/creaper/environments/_repository/`). Merging the release PR publishes a GitHub Release and triggers cross-platform binary builds (`x86_64`/`aarch64` Linux musl and macOS) that attach archives and `checksums.txt` to the release.

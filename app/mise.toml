@@ -1,0 +1,39 @@
+[tools]
+"aqua:nushell/nushell" = "0.114.1"
+rust = "1.100.0"
+
+[tasks.install]
+description = "Fetch the Rust crate dependencies"
+run = "cargo fetch --locked"
+
+[tasks.build]
+description = "Build the release binary"
+run = "cargo build --locked --release"
+
+[tasks.fmt]
+description = "Format the Rust sources"
+run = "cargo fmt"
+
+[tasks.fmt-check]
+description = "Check the format of the Rust sources"
+run = "cargo fmt --check"
+
+[tasks.clippy]
+description = "Lint the Rust sources with clippy"
+run = "cargo clippy --locked --all-targets -- -D warnings"
+
+[tasks.self-check]
+description = "Run creaper on tracked repository files"
+run = "cargo run --locked -- --tracked .."
+
+[tasks.lint]
+depends = ["clippy", "self-check"]
+description = "Lint the app sources"
+
+[tasks.test]
+description = "Run the unit and integration tests"
+run = "cargo test --locked"
+
+[tasks.validate]
+depends = ["fmt-check", "lint", "test"]
+description = "Run every app check"

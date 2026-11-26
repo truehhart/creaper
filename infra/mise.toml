@@ -1,0 +1,27 @@
+[tools]
+opentofu = "1.12.5"
+terragrunt = "1.1.2"
+
+[env]
+TG_PROVIDER_CACHE = "1"
+TG_TF_PATH = "tofu"
+
+[tasks.terragrunt-fmt]
+description = "Format the Terragrunt files"
+run = "terragrunt hcl format"
+
+[tasks.tofu-fmt]
+description = "Format the OpenTofu files"
+run = "tofu fmt -recursive modules"
+
+[tasks.tofu-fmt-check]
+description = "Check the format of the OpenTofu files"
+run = "tofu fmt -check -diff -recursive modules"
+
+[tasks.fmt]
+depends = ["terragrunt-fmt", "tofu-fmt"]
+description = "Format the OpenTofu and Terragrunt files"
+
+[tasks.validate]
+depends = ["terragrunt-fmt --check --diff", "tofu-fmt-check"]
+description = "Validate the infrastructure files"

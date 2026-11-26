@@ -1,0 +1,72 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: >-
+    ${{ github.event_name == 'release' && format('release-{0}', github.event.release.tag_name) ||
+    format('ci-{0}', github.ref) }}
+  cancel-in-progress: ${{ github.event_name != 'release' }}
+
+jobs:
+  validate:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/validate.yaml
+
+  build:
+    needs: validate
+    if: >-
+      !cancelled() &&
+      needs.validate.result == 'success' &&
+      github.event_name != 'release'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yaml
+
+  release:
+    needs: [validate, build]
+    if: >-
+      !cancelled() &&
+      needs.validate.result == 'success' &&
+      needs.build.result == 'success' &&
+      github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Create the app token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Update the release PR
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          release-type: rust
+          path: app
+          include-component-in-tag: false
+          token: ${{ steps.app-token.outputs.token }}
+
+  publish:
+    needs: validate
+    if: >-
+      !cancelled() &&
+      needs.validate.result == 'success' &&
+      github.event_name == 'release'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish.yaml
+    with:
+      release-tag: ${{ github.event.release.tag_name }}
