@@ -1,6 +1,6 @@
 [tools]
 "aqua:nushell/nushell" = "0.114.1"
-rust = "1.100.0"
+rust = { components = "rustfmt,clippy", version = "1.100.0" }
 
 [tasks.install]
 description = "Fetch the Rust crate dependencies"
